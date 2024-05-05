@@ -1,4 +1,4 @@
-from irc_a_v12 import connect_to_twitch, on_publicmsg
+from irc_a_v12 import connect_to_twitch
 from voice import available_voices
 from dotenv import load_dotenv
 import os
