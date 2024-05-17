@@ -4,30 +4,40 @@ import sys
 import os
 from dotenv import load_dotenv
 from voice import dubbing
+
 load_dotenv()
 
+
 def on_connect(connection, event):
-    channel = os.getenv('CHANNEL')
-    channel = '#' + channel
+    channel = os.getenv("CHANNEL")
+    channel = "#" + channel
     connection.join(channel)
-    print(f'connected to the {channel}')
+    print(f"connected to the {channel}")
+
 
 def on_join(connection, event):
-    print(f'Joined {event.target}')
+    print(f"Joined {event.target}")
+
 
 def on_publicmsg(connection, event):
-    print(f'Message from {event.source.nick}: {event.arguments[0]}')
+    print(f"Message from {event.source.nick}: {event.arguments[0]}")
     dubbing(event.arguments[0])
 
+
 def on_disconnect(connection, event):
-    print('Disconnected, Reconnecting...')
+    print("Disconnected, Reconnecting...")
     connect_to_twitch()
 
-def connect_to_twitch():
-    server = 'irc.chat.twitch.tv'
+
+def connect_to_twitch(tw_nickname, tw_oauth):
+    server = "irc.chat.twitch.tv"
     port = 6667
-    nickname = os.getenv('CHANNEL')
-    passowrd = os.getenv('OAUTH')
+    if os.getenv("USE_GUI") == "True":
+        nickname = tw_nickname
+        passowrd = tw_oauth
+    else:
+        nickname = os.getenv("CHANNEL")
+        passowrd = os.getenv("OAUTH")
 
     reactor = irc.client.Reactor()
     try:
@@ -35,14 +45,12 @@ def connect_to_twitch():
     except irc.client.ServerConnectionError:
         print(sys.exc_info()[1])
         raise SystemExit
-    conncetion.add_global_handler('welcome', on_connect)
-    conncetion.add_global_handler('join', on_join)
-    conncetion.add_global_handler('pubmsg', on_publicmsg)
-    conncetion.add_global_handler('disconnect', on_disconnect)
+    conncetion.add_global_handler("welcome", on_connect)
+    conncetion.add_global_handler("join", on_join)
+    conncetion.add_global_handler("pubmsg", on_publicmsg)
+    conncetion.add_global_handler("disconnect", on_disconnect)
     reactor.process_forever()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     connect_to_twitch()
-
-
