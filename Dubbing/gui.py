@@ -1,68 +1,100 @@
 import tkinter as tk
 from tkinter import messagebox
+from dotenv import load_dotenv
 from irc_a_v12 import connect_to_twitch
+import os
 import threading
 
+# Load .env file
+load_dotenv()
+
 def run_login_app():
-    def on_submit():
-        # Retrieve user inputs
-        oauth = oauth_var.get()
-        nickname = nickname_var.get()
+    # Function to handle login
+    def handle_login(name, password):
+        if not name or not password:
+            messagebox.showerror("Error", "Please enter both name and password.")
+            return
+        
+        # Print the name and password to the terminal
+        print(f"Name: {name}")
+        print(f"Password: {password}")
+        threading.Thread(target=connect_to_twitch, args=(name, password)).start()
 
-        print(f"Logged in user: {nickname} and {oauth}")
 
-        # Store the inputs in global variables
-        global full_oauth, full_nickname
-        full_oauth = oauth
-        full_nickname = nickname
+        login_window.destroy()
+        show_greeting_window(name)
 
-        # Display a success message
-        messagebox.showinfo("Login Successful", "You are logged in.")
+    # Function to handle login using .env file
+    def handle_env_login():
+        name = os.getenv("CHANNEL")
+        password = os.getenv("OAUTH")
+        
+        if not name or not password:
+            messagebox.showerror("Error", ".env file is missing or incomplete.")
+            return
+        
+        # Print the name and password to the terminal
+        print(f"Name: {name}")
+        print(f"Password: {password}")
+        threading.Thread(target=connect_to_twitch, args=(name, password)).start()
+        
+        login_window.destroy()
+        show_greeting_window(name)
 
-        # Start the Twitch connection in a new thread
-        threading.Thread(target=connect_to_twitch, args=(nickname, oauth)).start()
+    # Function to show greeting window
+    def show_greeting_window(name):
+        greeting_window = tk.Tk()
+        greeting_window.title("Greeting Window")
+        greeting_window.geometry("400x300")  # Set the size of the greeting window
 
-        # Close the login window and open the status window
-        root.destroy()
-        display_window()
+        # Function to handle closing of the greeting window
+        def on_greeting_window_close():
+            greeting_window.destroy()
+            root.quit()
 
-    def display_window():
-        # Create a new window to display connection status
-        new_window = tk.Tk()
-        new_window.title("Status")
-        new_window.geometry("400x200")
+        greeting_window.protocol("WM_DELETE_WINDOW", on_greeting_window_close)
+        
+        greeting_label = tk.Label(greeting_window, text=f"Hello {name}!", font=("Helvetica", 18))
+        greeting_label.pack(pady=20)
+        
+        greeting_window.mainloop()
 
-        # Display the nickname and connection status
-        tk.Label(new_window, text=f"Hello, {full_nickname}", font=("Arial", 16)).pack(pady=20)
-        tk.Label(new_window, text="Connected to the server", font=("Arial", 16)).pack(pady=20)
+    # Function to handle closing of the login window
+    def on_login_window_close():
+        login_window.destroy()
+        
 
-        new_window.mainloop()
-
-    def information():
-        # Return the stored oauth and nickname
-        return full_oauth, full_nickname
-
-    # Initialize the main window
+    # Create root window to manage the entire application lifecycle
     root = tk.Tk()
-    root.title("Login")
-    root.geometry("400x200")
+    root.withdraw()  # Hide the root window as it's not needed
 
-    # Define variables to store user inputs
-    oauth_var = tk.StringVar()
-    nickname_var = tk.StringVar()
+    # Create login window
+    login_window = tk.Toplevel(root)
+    login_window.title("Login Window")
+    login_window.geometry("400x300")  # Set the size of the login window
 
-    # Create and place the widgets for user input
-    tk.Label(root, text="Oauth: ").pack(pady=(20, 0))
-    oauth_entry = tk.Entry(root, textvariable=oauth_var)
-    oauth_entry.pack()
+    # Bind the close event to the login window
+    login_window.protocol("WM_DELETE_WINDOW", on_login_window_close)
 
-    tk.Label(root, text="Nickname: ").pack(pady=(10, 0))
-    nickname_entry = tk.Entry(root, textvariable=nickname_var)
-    nickname_entry.pack()
+    # Name label and entry
+    name_label = tk.Label(login_window, text="Name:")
+    name_label.pack(pady=5)
+    name_entry = tk.Entry(login_window)
+    name_entry.pack(pady=5)
 
-    # Create and place the submit button
-    submit_button = tk.Button(root, text="Log In", command=on_submit)
-    submit_button.pack(pady=20)
+    # Password label and entry
+    password_label = tk.Label(login_window, text="Password:")
+    password_label.pack(pady=5)
+    password_entry = tk.Entry(login_window, show="*")
+    password_entry.pack(pady=5)
+
+    # Login button
+    login_button = tk.Button(login_window, text="Login", command=lambda: handle_login(name_entry.get(), password_entry.get()))
+    login_button.pack(pady=10)
+
+    # Login with .env button
+    env_login_button = tk.Button(login_window, text="Login with .env", command=handle_env_login)
+    env_login_button.pack(pady=5)
 
     root.mainloop()
 

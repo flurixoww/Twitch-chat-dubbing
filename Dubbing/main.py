@@ -12,9 +12,6 @@ if os.getenv("SHOW_AVAILABLE_VOICES") == "True":
     available_voices()
 
 # Determine whether to use the GUI for login or connect directly using environment variables
-if os.getenv("USE_GUI") == "True":
-    run_login_app()
-else:
-    connect_to_twitch(None, None)
 
+run_login_app()
 

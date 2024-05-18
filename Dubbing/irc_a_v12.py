@@ -48,12 +48,8 @@ def connect_to_twitch(tw_nickname=None, tw_oauth=None):
     port = 6667
 
     # Determine whether to use GUI inputs or environment variables
-    if os.getenv("USE_GUI") == "True":
-        nickname = tw_nickname
-        password = tw_oauth
-    else:
-        nickname = os.getenv("CHANNEL")
-        password = os.getenv("OAUTH")
+    nickname = tw_nickname
+    password = tw_oauth
 
     reactor = irc.client.Reactor()
 
