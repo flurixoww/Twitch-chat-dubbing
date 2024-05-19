@@ -11,7 +11,5 @@ load_dotenv()
 if os.getenv("SHOW_AVAILABLE_VOICES") == "True":
     available_voices()
 
-# Determine whether to use the GUI for login or connect directly using environment variables
-
+#Running the app
 run_login_app()
-

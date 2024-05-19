@@ -1,3 +1,4 @@
+#Libraries import
 import tkinter as tk
 from tkinter import messagebox
 from dotenv import load_dotenv
@@ -8,18 +9,18 @@ import threading
 # Load .env file
 load_dotenv()
 
+#Login window
 def run_login_app():
     # Function to handle login
     def handle_login(name, password):
         if not name or not password:
             messagebox.showerror("Error", "Please enter both name and password.")
             return
-        
+
         # Print the name and password to the terminal
         print(f"Name: {name}")
         print(f"Password: {password}")
         threading.Thread(target=connect_to_twitch, args=(name, password)).start()
-
 
         login_window.destroy()
         show_greeting_window(name)
@@ -28,16 +29,16 @@ def run_login_app():
     def handle_env_login():
         name = os.getenv("CHANNEL")
         password = os.getenv("OAUTH")
-        
+
         if not name or not password:
             messagebox.showerror("Error", ".env file is missing or incomplete.")
             return
-        
+
         # Print the name and password to the terminal
         print(f"Name: {name}")
         print(f"Password: {password}")
         threading.Thread(target=connect_to_twitch, args=(name, password)).start()
-        
+
         login_window.destroy()
         show_greeting_window(name)
 
@@ -51,18 +52,18 @@ def run_login_app():
         def on_greeting_window_close():
             greeting_window.destroy()
             root.quit()
+            os.abort()
 
         greeting_window.protocol("WM_DELETE_WINDOW", on_greeting_window_close)
-        
-        greeting_label = tk.Label(greeting_window, text=f"Hello {name}!", font=("Helvetica", 18))
+
+        greeting_label = tk.Label(greeting_window, text=f"Connected to the {name}", font=("Helvetica", 18))
         greeting_label.pack(pady=20)
-        
+
         greeting_window.mainloop()
 
     # Function to handle closing of the login window
     def on_login_window_close():
         login_window.destroy()
-        
 
     # Create root window to manage the entire application lifecycle
     root = tk.Tk()
@@ -89,7 +90,8 @@ def run_login_app():
     password_entry.pack(pady=5)
 
     # Login button
-    login_button = tk.Button(login_window, text="Login", command=lambda: handle_login(name_entry.get(), password_entry.get()))
+    login_button = tk.Button(login_window, text="Login",
+                             command=lambda: handle_login(name_entry.get(), password_entry.get()))
     login_button.pack(pady=10)
 
     # Login with .env button
@@ -97,4 +99,3 @@ def run_login_app():
     env_login_button.pack(pady=5)
 
     root.mainloop()
-

@@ -8,6 +8,7 @@ from voice import dubbing
 # Load environment variables from a .env file
 load_dotenv()
 
+
 def on_connect(connection, event):
     """
     Called when the bot connects to the server.
@@ -18,11 +19,13 @@ def on_connect(connection, event):
     connection.join(channel)
     print(f"Connected to the {channel}")
 
+
 def on_join(connection, event):
     """
     Called when the bot joins a channel.
     """
     print(f"Joined {event.target}")
+
 
 def on_publicmsg(connection, event):
     """
@@ -32,6 +35,7 @@ def on_publicmsg(connection, event):
     print(f"Message from {event.source.nick}: {event.arguments[0]}")
     dubbing(event.arguments[0])
 
+
 def on_disconnect(connection, event):
     """
     Called when the bot disconnects from the server.
@@ -39,6 +43,7 @@ def on_disconnect(connection, event):
     """
     print("Disconnected, Reconnecting...")
     connect_to_twitch()
+
 
 def connect_to_twitch(tw_nickname=None, tw_oauth=None):
     """
@@ -68,6 +73,7 @@ def connect_to_twitch(tw_nickname=None, tw_oauth=None):
 
     # Start the IRC event loop
     reactor.process_forever()
+
 
 if __name__ == "__main__":
     connect_to_twitch()

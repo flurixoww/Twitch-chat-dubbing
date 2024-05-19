@@ -9,12 +9,14 @@ load_dotenv()
 engine = pyttsx3.init()
 voices = engine.getProperty("voices")
 
+
 def available_voices():
     """
     Prints the available voices provided by the TTS engine.
     """
     for voice in voices:
         print(voice)
+
 
 def dubbing(message):
     """
@@ -24,7 +26,7 @@ def dubbing(message):
     # Set the voice based on the environment variable
     voice_index = int(os.getenv("VOICE", 0))
     engine.setProperty("voice", voices[voice_index].id)
-    
+
     # Speak the message
     engine.say(message)
     engine.runAndWait()
